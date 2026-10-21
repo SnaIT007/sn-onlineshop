@@ -57,7 +57,7 @@ footer{text-align:center;background:#222;color:white;padding:25px 10px;font-size
 .btn-order:hover{background:#d83c20}
 .gallery-note{font-size:12px;color:#999;margin-top:8px}
 
-/* ===== ตะกร้าสินค้า (แผ่นข้างขวา) ===== */
+/* ===== ตะกร้าสินค้า ===== */
 .cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:70;display:none}
 .cart-panel{position:fixed;top:0;right:0;height:100%;width:360px;max-width:92vw;background:#fff;z-index:80;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column;box-shadow:-4px 0 20px rgba(0,0,0,.15)}
 .cart-panel.open{transform:translateX(0)}
@@ -73,11 +73,25 @@ footer{text-align:center;background:#222;color:white;padding:25px 10px;font-size
 .cart-foot{padding:16px 18px;border-top:1px solid #eee}
 .cart-total{display:flex;justify-content:space-between;font-size:17px;font-weight:bold;margin-bottom:12px}
 .cart-total span:last-child{color:#ee4d2d}
-.order-btn{width:100%;padding:13px;border:0;border-radius:8px;background:#06c755;color:white;font-size:15px;font-weight:bold;cursor:pointer;margin-bottom:8px}
-.order-btn:hover{background:#05a847}
-.copy-btn{width:100%;padding:11px;border:1px solid #ddd;border-radius:8px;background:#fff;color:#333;font-size:14px;cursor:pointer;margin-bottom:8px}
+.pay-label{font-size:13px;color:#666;margin-bottom:8px;font-weight:bold}
+.pay-btns{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.pay-btn{flex:1;min-width:120px;padding:11px;border-radius:8px;font-size:13px;font-weight:bold;cursor:pointer;border:0}
+.pay-cod{background:#06c755;color:white}
+.pay-cod:hover{background:#05a847}
+.pay-bank{background:#1e6fd9;color:white}
+.pay-bank:hover{background:#185ab0}
+.bank-box{display:none;background:#f0f6ff;border:1px solid #c5dbf5;border-radius:8px;padding:12px;margin-bottom:10px;font-size:13px;line-height:1.7}
+.bank-box.show{display:block}
+.bank-row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.bank-copy{background:#1e6fd9;color:white;border:0;border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;flex-shrink:0}
+.bank-copy:hover{background:#185ab0}
+.bank-acc{font-weight:bold;font-size:16px;letter-spacing:.5px}
+.slip-hint{background:#fff8e6;border:1px solid #f0dfa8;color:#8a6d1a;border-radius:6px;padding:8px 10px;font-size:12px;margin-top:8px;line-height:1.5}
+.order-line-btn{width:100%;padding:11px;border:0;border-radius:8px;background:#06c755;color:white;font-size:14px;font-weight:bold;cursor:pointer;margin-top:8px}
+.order-line-btn:hover{background:#05a847}
+.copy-btn{width:100%;padding:11px;border:1px solid #ddd;border-radius:8px;background:#fff;color:#333;font-size:14px;cursor:pointer;margin-top:8px}
 .copy-btn:hover{background:#f5f5f5}
-.clear-btn{width:100%;padding:9px;border:0;background:none;color:#999;font-size:13px;cursor:pointer;text-decoration:underline}
+.clear-btn{width:100%;padding:9px;border:0;background:none;color:#999;font-size:13px;cursor:pointer;text-decoration:underline;margin-top:4px}
 .line-hint{font-size:11px;color:#999;text-align:center;margin-top:8px;line-height:1.5}
 
 @media(max-width:800px){.products{grid-template-columns:repeat(3,minmax(0,1fr))}.photo{height:135px}.detail-top{grid-template-columns:1fr}}
@@ -98,7 +112,7 @@ footer{text-align:center;background:#222;color:white;padding:25px 10px;font-size
 </nav>
 <section class="banner">
 <h2>ยินดีต้อนรับสู่ SNOnlineshop</h2>
-<p>ค้นหาอุปกรณ์ที่คุณต้องการได้ที่นี่ · กดที่สินค้าเพื่อดูรายละเอียด · สั่งซื้อผ่าน LINE ได้เลย</p>
+<p>ค้นหาอุปกรณ์ที่คุณต้องการได้ที่นี่ · ชำระได้ 2 วิธี: เก็บเงินปลายทาง / โอนผ่านบัญชี</p>
 </section>
 <main>
 <div id="listView">
@@ -114,7 +128,6 @@ footer{text-align:center;background:#222;color:white;padding:25px 10px;font-size
 
 <button class="cart-fab" onclick="toggleCart()">ตะกร้า (<span id="count">0</span>)</button>
 
-<!-- ตะกร้าสินค้า -->
 <div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
 <div class="cart-panel" id="cartPanel">
   <div class="cart-head">
@@ -124,16 +137,31 @@ footer{text-align:center;background:#222;color:white;padding:25px 10px;font-size
   <div class="cart-items" id="cartItems"></div>
   <div class="cart-foot">
     <div class="cart-total"><span>รวมทั้งหมด</span><span id="cartTotal">฿0</span></div>
-    <button class="order-btn" onclick="orderViaLine()">สั่งซื้อผ่าน LINE</button>
+    <div class="pay-label">เลือกวิธีชำระเงิน:</div>
+    <div class="pay-btns">
+      <button class="pay-btn pay-cod" onclick="orderViaLine('cod')">เก็บเงินปลายทาง</button>
+      <button class="pay-btn pay-bank" onclick="showBank()">โอนผ่านบัญชี</button>
+    </div>
+    <!-- กล่องบัญชีธนาคาร (แสดงเมื่อกดโอนผ่านบัญชี) -->
+    <div class="bank-box" id="bankBox">
+      <div><strong>ธนาคาร:</strong> <span id="bankName">-</span></div>
+      <div class="bank-row">
+        <div><strong>เลขบัญชี:</strong> <span class="bank-acc" id="bankNumber">-</span></div>
+        <button class="bank-copy" onclick="copyAccount()">คัดลอก</button>
+      </div>
+      <div><strong>ชื่อบัญชี:</strong> <span id="bankAccName">-</span></div>
+      <div class="slip-hint">โอนเงินแล้ว ให้<strong>แนบสลิป</strong>ในแชท LINE ด้วยนะครับ ร้านจะเช็คแล้วจัดส่งทันที</div>
+      <button class="order-line-btn" onclick="orderViaLine('transfer')">เปิด LINE สั่งซื้อ (โอนเงิน)</button>
+    </div>
     <button class="copy-btn" onclick="copyOrder()">คัดลอกรายการสั่งซื้อ</button>
     <button class="clear-btn" onclick="clearCart()">ล้างตะกร้า</button>
-    <div class="line-hint">กดสั่งซื้อผ่าน LINE ระบบจะเติมรายการสินค้าให้อัตโนมัติ<br>แค่พิมพ์ที่อยู่จัดส่งเพิ่มเติมแล้วส่งได้เลย</div>
+    <div class="line-hint">ระบบจะเติมรายการสินค้า+วิธีชำระให้อัตโนมัติ<br>แค่พิมพ์ที่อยู่จัดส่งเพิ่มเติมแล้วส่งได้เลย</div>
   </div>
 </div>
 
 <footer>
 <strong>SNOnlineshop</strong>
-<p>ขอบคุณที่แวะมาเยี่ยมชมร้านของเรา · สั่งซื้อผ่าน LINE ได้เลย</p>
+<p>ขอบคุณที่แวะมาเยี่ยมชมร้านของเรา · ชำระได้ 2 วิธี: เก็บเงินปลายทาง / โอนผ่านบัญชี</p>
 <p>สอบถามรายละเอียดสินค้าก่อนสั่งซื้อ</p>
 </footer>
 
@@ -142,19 +170,26 @@ footer{text-align:center;background:#222;color:white;padding:25px 10px;font-size
    ===== ตั้งค่า LINE ของร้าน (สำคัญ! ให้แก้ตรงนี้ก่อน) =====
    ใส่ LINE Official Account ID ของร้านคุณ ต้องมี @ นำหน้า
    ตัวอย่าง: const LINE_ID = "@snonlineshop";
-   วิธีหา: เปิด LINE OA Manager → หน้าโปรไฟล์ → Basic ID
-   ถ้ายังไม่มี LINE OA: ปล่อยว่างไว้ ระบบจะใช้ปุ่มคัดลอกรายการแทน
+   วิธีหา: LINE OA Manager → การตั้งค่า → โปรไฟล์ → Basic ID
+   ถ้ายังไม่มี: ปล่อยว่างไว้ ระบบจะใช้ปุ่มคัดลอกรายการแทน
    ============================================================ */
 const LINE_ID = "@484zxlyo";   // <-- ใส่ LINE ID ของร้านตรงนี้ เช่น "@snonlineshop"
 
 /* ============================================================
+   ===== ตั้งค่าบัญชีธนาคารสำหรับโอนเงิน (แก้ตรงนี้) =====
+   ถ้าไม่ต้องการรับโอน ให้ปล่อย number ว่างไว้ ปุ่มจะซ่อนเอง
+   ============================================================ */
+const BANK = {
+  bank: "ธนาคารไทยพาณิชย์",        // <-- ชื่อธนาคาร
+  number: "3282552740",       // <-- เลขบัญชี
+  name: "SINA SOR"          // <-- ชื่อบัญชี (ตรงสมุด)
+};
+
+/* ============================================================
    วิธีเพิ่มสินค้า: เพิ่มบล็อกใหม่ใน items ตามแบบนี้
-   {
-     name:"ชื่อสินค้า", price:150, cat:"ESP32", emoji:"🔌",
-     imgs:["รูป1.jpg","รูป2.jpg"],   // ว่าง = แสดง emoji
-     desc:"รายละเอียด...",
-     specs:[["ชิป","ESP32"],["WiFi","2.4GHz"]]
-   },
+   { name:"ชื่อสินค้า", price:150, cat:"ESP32", emoji:"🔌",
+     imgs:["รูป1.jpg"], desc:"รายละเอียด...",
+     specs:[["ชิป","ESP32"],["WiFi","2.4GHz"]] },
    ============================================================ */
 const items=[
   {name:"nRFbox V2",price:1450,cat:"อุปกรณ์ DIY",emoji:"📟",imgs:[],
@@ -172,13 +207,10 @@ const items=[
 ];
 
 let category="ทั้งหมด";
-let cart=[];   // เก็บชื่อสินค้า ซ้ำกันได้ (นับเป็นจำนวน)
+let cart=[];
 let currentProduct=-1, currentImg=0;
 
-function priceOf(name){
-  const p=items.find(x=>x.name===name);
-  return p?p.price:0;
-}
+function priceOf(name){const p=items.find(x=>x.name===name);return p?p.price:0;}
 
 /* ---------- รายการสินค้า ---------- */
 function render(){
@@ -230,48 +262,55 @@ function setImg(idx){currentImg=idx;renderDetail();}
 function goHome(){document.getElementById("detailView").style.display="none";document.getElementById("listView").style.display="block";window.scrollTo({top:0,behavior:"smooth"});}
 
 /* ---------- ตะกร้า ---------- */
-function addCart(name){
-  cart.push(name);
-  document.getElementById("count").textContent=cart.length;
-  alert("เพิ่ม "+name+" ลงตะกร้าแล้ว");
-}
+function addCart(name){cart.push(name);document.getElementById("count").textContent=cart.length;alert("เพิ่ม "+name+" ลงตะกร้าแล้ว");}
 function toggleCart(forceOpen){
-  const panel=document.getElementById("cartPanel");
-  const overlay=document.getElementById("cartOverlay");
+  const panel=document.getElementById("cartPanel"), overlay=document.getElementById("cartOverlay");
   const open=forceOpen===true?!panel.classList.contains("open"):forceOpen===false?false:!panel.classList.contains("open");
   panel.classList.toggle("open",open);
   overlay.style.display=open?"block":"none";
-  if(open)renderCart();
+  if(open){renderCart();document.getElementById("bankBox").classList.remove("show");}
 }
 function renderCart(){
   const box=document.getElementById("cartItems");
   if(!cart.length){box.innerHTML='<div class="cart-empty">ตะกร้าว่างอยู่<br>กดเพิ่มสินค้าก่อนนะครับ</div>';document.getElementById("cartTotal").textContent="฿0";return;}
-  const summary={};
-  cart.forEach(n=>summary[n]=(summary[n]||0)+1);
+  const summary={};cart.forEach(n=>summary[n]=(summary[n]||0)+1);
   let total=0;
-  box.innerHTML=Object.entries(summary).map(([n,c])=>{
-    const sub=priceOf(n)*c; total+=sub;
-    return `<div class="cart-item"><span class="ci-name">${n}</span><span class="ci-qty">x${c}</span><span class="ci-price">฿${sub.toLocaleString("th-TH")}</span></div>`;
-  }).join("");
+  box.innerHTML=Object.entries(summary).map(([n,c])=>{const sub=priceOf(n)*c;total+=sub;return `<div class="cart-item"><span class="ci-name">${n}</span><span class="ci-qty">x${c}</span><span class="ci-price">฿${sub.toLocaleString("th-TH")}</span></div>`;}).join("");
   document.getElementById("cartTotal").textContent="฿"+total.toLocaleString("th-TH");
 }
-function clearCart(){
-  if(!cart.length)return;
-  if(confirm("ต้องการล้างตะกร้าหรือไม่?")){cart=[];document.getElementById("count").textContent="0";renderCart();}
+function clearCart(){if(!cart.length)return;if(confirm("ต้องการล้างตะกร้าหรือไม่?")){cart=[];document.getElementById("count").textContent="0";renderCart();}}
+
+/* ---------- แสดงกล่องบัญชีธนาคาร ---------- */
+function showBank(){
+  if(!BANK.number||BANK.number==="000-0-00000-0"){
+    alert("ร้านยังไม่ได้ตั้งค่าบัญชีธนาคาร\nกรุณาแจ้งร้านหรือเลือกเก็บเงินปลายทาง");
+    return;
+  }
+  document.getElementById("bankName").textContent=BANK.bank;
+  document.getElementById("bankNumber").textContent=BANK.number;
+  document.getElementById("bankAccName").textContent=BANK.name;
+  document.getElementById("bankBox").classList.add("show");
+}
+function copyAccount(){
+  fallbackCopy(BANK.number,function(){alert("คัดลอกเลขบัญชีแล้วางได้เลย");});
 }
 
 /* ---------- สร้างข้อความสั่งซื้อ ---------- */
-function buildOrderText(){
+function buildOrderText(method){
   if(!cart.length)return "";
-  const summary={};
-  cart.forEach(n=>summary[n]=(summary[n]||0)+1);
+  const summary={};cart.forEach(n=>summary[n]=(summary[n]||0)+1);
   let total=0, i=1, lines=["สั่งซื้อสินค้าจาก SNOnlineshop","----------------"];
-  Object.entries(summary).forEach(([n,c])=>{
-    const sub=priceOf(n)*c; total+=sub;
-    lines.push(`${i}. ${n} x${c} = ฿${sub.toLocaleString("th-TH")}`); i++;
-  });
+  Object.entries(summary).forEach(([n,c])=>{const sub=priceOf(n)*c;total+=sub;lines.push(`${i}. ${n} x${c} = ฿${sub.toLocaleString("th-TH")}`);i++;});
   lines.push("----------------");
   lines.push(`รวมทั้งหมด: ฿${total.toLocaleString("th-TH")}`);
+  lines.push("");
+  if(method==="transfer"){
+    lines.push("วิธีชำระ: โอนผ่านบัญชีธนาคาร");
+    lines.push(`${BANK.bank} เลข ${BANK.number} ชื่อ ${BANK.name}`);
+    lines.push("(แนบสลิปการโอนมาด้วยในแชทนี้นะครับ)");
+  }else{
+    lines.push("วิธีชำระ: เก็บเงินปลายทาง (COD)");
+  }
   lines.push("");
   lines.push("ชื่อผู้รับ: ");
   lines.push("ที่อยู่จัดส่ง: ");
@@ -280,34 +319,31 @@ function buildOrderText(){
 }
 
 /* ---------- ปุ่มสั่งซื้อผ่าน LINE ---------- */
-function orderViaLine(){
+function orderViaLine(method){
   if(!cart.length){alert("ตะกร้าว่างอยู่ กรุณาเพิ่มสินค้าก่อน");return;}
-  const text=buildOrderText();
+  const text=buildOrderText(method);
   if(LINE_ID && LINE_ID.trim()){
     const url="https://line.me/R/oaMessage/"+LINE_ID.trim()+"/?text="+encodeURIComponent(text);
     window.open(url,"_blank");
   }else{
-    // ยังไม่ได้ใส่ LINE ID → ให้คัดลอกรายการแล้วแจ้งเตือน
-    copyOrder(true);
+    copyOrder(true,method);
     alert("ยังไม่ได้ตั้งค่า LINE ID ของร้าน\nระบบได้คัดลอกรายการสั่งซื้อไว้แล้ว\nให้เปิด LINE ของคุณแล้ววางส่งให้ร้าน\n\n(แนะนำ: กลับไปใส่ LINE_ID ในโค้ดด้วย จะได้กดเปิด LINE อัตโนมัติ)");
   }
 }
-function copyOrder(fromOrderBtn){
+function copyOrder(fromOrderBtn,method){
   if(!cart.length){alert("ตะกร้าว่างอยู่");return;}
-  const text=buildOrderText();
+  const text=buildOrderText(method||"cod");
   const done=()=>{if(!fromOrderBtn)alert("คัดลอกรายการสั่งซื้อแล้ว\nเปิด LINE/แชทแล้ววางส่งได้เลย");};
   if(navigator.clipboard&&navigator.clipboard.writeText){
     navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text,done));
-  }else{
-    fallbackCopy(text,done);
-  }
+  }else{fallbackCopy(text,done);}
 }
 function fallbackCopy(text,cb){
   const ta=document.createElement("textarea");
-  ta.value=text; ta.style.position="fixed"; ta.style.opacity="0";
-  document.body.appendChild(ta); ta.select();
+  ta.value=text;ta.style.position="fixed";ta.style.opacity="0";
+  document.body.appendChild(ta);ta.select();
   try{document.execCommand("copy");}catch(e){}
-  document.body.removeChild(ta); if(cb)cb();
+  document.body.removeChild(ta);if(cb)cb();
 }
 
 render();
