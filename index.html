@@ -30,7 +30,7 @@ main{padding:0 5% 30px}
 .note{color:#888;font-size:12px;margin-bottom:10px}
 .buy{width:100%;padding:10px;border:0;border-radius:5px;background:#ee4d2d;color:white;font-size:14px;cursor:pointer}
 .buy:hover{background:#d83c20}
-.cart{position:fixed;right:16px;bottom:16px;background:#ee4d2d;color:white;padding:13px 18px;border-radius:30px;border:0;box-shadow:0 3px 12px #aaa;cursor:pointer;z-index:50}
+.cart-fab{position:fixed;right:16px;bottom:16px;background:#ee4d2d;color:white;padding:13px 18px;border-radius:30px;border:0;box-shadow:0 3px 12px #aaa;cursor:pointer;z-index:60}
 footer{text-align:center;background:#222;color:white;padding:25px 10px;font-size:13px}
 
 /* ===== หน้ารายละเอียดสินค้า ===== */
@@ -51,9 +51,34 @@ footer{text-align:center;background:#222;color:white;padding:25px 10px;font-size
 .spec-table td{border:1px solid #eee;padding:9px 12px}
 .spec-table td:first-child{background:#fafafa;font-weight:bold;width:35%;color:#555}
 .detail-actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
-.btn-cart{flex:1;min-width:140px;padding:13px;border:0;border-radius:8px;background:#ee4d2d;color:white;font-size:15px;font-weight:bold;cursor:pointer}
-.btn-cart:hover{background:#d83c20}
+.btn-cart{flex:1;min-width:130px;padding:13px;border:1px solid #ee4d2d;border-radius:8px;background:#fff;color:#ee4d2d;font-size:15px;font-weight:bold;cursor:pointer}
+.btn-cart:hover{background:#fff0eb}
+.btn-order{flex:1.4;min-width:140px;padding:13px;border:0;border-radius:8px;background:#ee4d2d;color:white;font-size:15px;font-weight:bold;cursor:pointer}
+.btn-order:hover{background:#d83c20}
 .gallery-note{font-size:12px;color:#999;margin-top:8px}
+
+/* ===== ตะกร้าสินค้า (แผ่นข้างขวา) ===== */
+.cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:70;display:none}
+.cart-panel{position:fixed;top:0;right:0;height:100%;width:360px;max-width:92vw;background:#fff;z-index:80;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column;box-shadow:-4px 0 20px rgba(0,0,0,.15)}
+.cart-panel.open{transform:translateX(0)}
+.cart-head{padding:16px 18px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center}
+.cart-head h3{margin:0;font-size:17px}
+.cart-close{background:none;border:0;font-size:22px;cursor:pointer;color:#888;line-height:1}
+.cart-items{flex:1;overflow-y:auto;padding:10px 18px}
+.cart-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px dashed #eee;font-size:14px}
+.cart-item .ci-name{flex:1;padding-right:8px}
+.cart-item .ci-qty{color:#ee4d2d;font-weight:bold;margin:0 8px;white-space:nowrap}
+.cart-item .ci-price{font-weight:bold;white-space:nowrap}
+.cart-empty{text-align:center;color:#999;padding:40px 10px;font-size:14px}
+.cart-foot{padding:16px 18px;border-top:1px solid #eee}
+.cart-total{display:flex;justify-content:space-between;font-size:17px;font-weight:bold;margin-bottom:12px}
+.cart-total span:last-child{color:#ee4d2d}
+.order-btn{width:100%;padding:13px;border:0;border-radius:8px;background:#06c755;color:white;font-size:15px;font-weight:bold;cursor:pointer;margin-bottom:8px}
+.order-btn:hover{background:#05a847}
+.copy-btn{width:100%;padding:11px;border:1px solid #ddd;border-radius:8px;background:#fff;color:#333;font-size:14px;cursor:pointer;margin-bottom:8px}
+.copy-btn:hover{background:#f5f5f5}
+.clear-btn{width:100%;padding:9px;border:0;background:none;color:#999;font-size:13px;cursor:pointer;text-decoration:underline}
+.line-hint{font-size:11px;color:#999;text-align:center;margin-top:8px;line-height:1.5}
 
 @media(max-width:800px){.products{grid-template-columns:repeat(3,minmax(0,1fr))}.photo{height:135px}.detail-top{grid-template-columns:1fr}}
 @media(max-width:520px){.products{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.photo{height:125px}.info{padding:9px}.name{font-size:14px}.price{font-size:19px}.banner{padding:20px 15px}.detail{padding:14px}.detail-name{font-size:19px}.detail-price{font-size:24px}}
@@ -73,97 +98,95 @@ footer{text-align:center;background:#222;color:white;padding:25px 10px;font-size
 </nav>
 <section class="banner">
 <h2>ยินดีต้อนรับสู่ SNOnlineshop</h2>
-<p>ค้นหาอุปกรณ์ที่คุณต้องการได้ที่นี่ · กดที่สินค้าเพื่อดูรายละเอียดและรูปเพิ่มเติม</p>
+<p>ค้นหาอุปกรณ์ที่คุณต้องการได้ที่นี่ · กดที่สินค้าเพื่อดูรายละเอียด · สั่งซื้อผ่าน LINE ได้เลย</p>
 </section>
 <main>
-<!-- หน้ารายการสินค้า -->
 <div id="listView">
 <h2 class="section-title">สินค้าของเรา</h2>
 <div class="products" id="products"></div>
 </div>
 
-<!-- หน้ารายละเอียดสินค้า (ซ่อนอยู่ตอนแรก) -->
 <div id="detailView" style="display:none">
 <button class="back-btn" onclick="goHome()">← กลับไปยังรายการสินค้า</button>
 <div class="detail" id="detailBox"></div>
 </div>
 </main>
-<button class="cart" onclick="showCart()">ตะกร้า (<span id="count">0</span>)</button>
+
+<button class="cart-fab" onclick="toggleCart()">ตะกร้า (<span id="count">0</span>)</button>
+
+<!-- ตะกร้าสินค้า -->
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+<div class="cart-panel" id="cartPanel">
+  <div class="cart-head">
+    <h3>ตะกร้าสินค้า</h3>
+    <button class="cart-close" onclick="toggleCart()">×</button>
+  </div>
+  <div class="cart-items" id="cartItems"></div>
+  <div class="cart-foot">
+    <div class="cart-total"><span>รวมทั้งหมด</span><span id="cartTotal">฿0</span></div>
+    <button class="order-btn" onclick="orderViaLine()">สั่งซื้อผ่าน LINE</button>
+    <button class="copy-btn" onclick="copyOrder()">คัดลอกรายการสั่งซื้อ</button>
+    <button class="clear-btn" onclick="clearCart()">ล้างตะกร้า</button>
+    <div class="line-hint">กดสั่งซื้อผ่าน LINE ระบบจะเติมรายการสินค้าให้อัตโนมัติ<br>แค่พิมพ์ที่อยู่จัดส่งเพิ่มเติมแล้วส่งได้เลย</div>
+  </div>
+</div>
+
 <footer>
 <strong>SNOnlineshop</strong>
-<p>ขอบคุณที่แวะมาเยี่ยมชมร้านของเรา · กดที่สินค้าเพื่อดูรูปและรายละเอียดเพิ่มเติม</p>
+<p>ขอบคุณที่แวะมาเยี่ยมชมร้านของเรา · สั่งซื้อผ่าน LINE ได้เลย</p>
 <p>สอบถามรายละเอียดสินค้าก่อนสั่งซื้อ</p>
 </footer>
 
 <script>
 /* ============================================================
+   ===== ตั้งค่า LINE ของร้าน (สำคัญ! ให้แก้ตรงนี้ก่อน) =====
+   ใส่ LINE Official Account ID ของร้านคุณ ต้องมี @ นำหน้า
+   ตัวอย่าง: const LINE_ID = "@snonlineshop";
+   วิธีหา: เปิด LINE OA Manager → หน้าโปรไฟล์ → Basic ID
+   ถ้ายังไม่มี LINE OA: ปล่อยว่างไว้ ระบบจะใช้ปุ่มคัดลอกรายการแทน
+   ============================================================ */
+const LINE_ID = "";   // <-- ใส่ LINE ID ของร้านตรงนี้ เช่น "@snonlineshop"
+
+/* ============================================================
    วิธีเพิ่มสินค้า: เพิ่มบล็อกใหม่ใน items ตามแบบนี้
    {
-     name:"ชื่อสินค้า",
-     price:150,
-     cat:"ESP32",            // หมวด: ESP32 / อุปกรณ์ DIY / อื่นๆ
-     emoji:"🔌",              // ใช้เมื่อยังไม่มีรูป
-     imgs:[],                 // ใส่ลิงก์รูปหลายรูป เช่น ["esp32-1.jpg","esp32-2.jpg"]
-     desc:"รายละเอียดสินค้า...",
-     specs:[["ชิปประมวลผล","ESP32"],["WiFi","2.4GHz"]]
+     name:"ชื่อสินค้า", price:150, cat:"ESP32", emoji:"🔌",
+     imgs:["รูป1.jpg","รูป2.jpg"],   // ว่าง = แสดง emoji
+     desc:"รายละเอียด...",
+     specs:[["ชิป","ESP32"],["WiFi","2.4GHz"]]
    },
-   - ถ้า imgs ว่าง จะแสดง emoji อัตโนมัติ
-   - ถ้ามีรูปหลายรูป จะมีรูปเล็กด้านล่างให้กดดูสลับกัน
    ============================================================ */
 const items=[
-  {
-    name:"nRFbox V2",
-    price:1450,
-    cat:"อุปกรณ์ DIY",
-    emoji:"📟",
-    imgs:["nRFbox-V2.png"],
-    desc:"สามารถรบกวนสัญญาณBluetoothและสัญญาณWiFiรวมถึงสัญญาณDrone",
-    specs:[["ประเภท","nRFBox v2 เป็นอุปกรณ์ Open-source แบบพกพาสำหรับทดสอบและวิเคราะห์เครือข่ายไร้สายความถี่ 2.4GHz (รองรับ Wi-Fi, BLE และ Zigbee) สามารถรบกวนสัญญาณBluetoothและสัญญาณWiFiรวมถึงสัญญาณDrone"],["ชิป","ESP32"],["แถม","เสาอากาศ3ชิ้น"]]
-  },
-  {
-    name:"ESP32-C3 Mini",
-    price:78,
-    cat:"ESP32",
-    emoji:"🔌",
-    imgs:[],
-    desc:"บอร์ด ESP32-C3 ขนาดเล็ก รองรับ WiFi และ Bluetooth Low Energy เหมาะกับโปรเจคที่มีพื้นที่จำกัด",
-    specs:[["ชิป","ESP32-C3"],["WiFi","2.4GHz"],["Bluetooth","BLE 5.0"],["ขา GPIO","15 ขา"]]
-  },
-  {
-    name:"ESP32 DevKit",
-    price:123,
-    cat:"ESP32",
-    emoji:"💻",
-    imgs:[],
-    desc:"บอร์ดพัฒนา ESP32 DevKit V1 รองรับ WiFi + Bluetooth Dual Core ชาญสมรรถนะ เหมาะกับเริ่มต้นเรียน IoT",
-    specs:[["ชิป","ESP32-WROOM-32"],["WiFi","2.4GHz"],["Bluetooth","Classic + BLE"],["ขา GPIO","30 ขา"],["USB","Micro-USB"]]
-  },
-  {
-    name:"อุปกรณ์อิเล็กทรอนิกส์ DIY",
-    price:99,
-    cat:"อุปกรณ์ DIY",
-    emoji:"🔧",
-    imgs:[],
-    desc:"ชุดอุปกรณ์อิเล็กทรอนิกส์พื้นฐานสำหรับงาน DIY ประกอบด้วย ตัวต้านทาน ตัวเก็บประจุ LED และสายจั๊มเปอร์",
-    specs:[["เนื้อหา","ต้านทาน คาปาซิเตอร์ LED สายจั๊มเปอร์"],["เหมาะกับ","มือใหม่เริ่มเรียนอิเล็กทรอนิกส์"]]
-  }
+  {name:"nRFbox V2",price:1450,cat:"อุปกรณ์ DIY",emoji:"📟",imgs:[],
+   desc:"กล่องอุปกรณ์ DIY สำหรับงานไร้สาย Nordic nRF เหมาะสำหรับทำโปรเจค IoT และเซ็นเซอร์ไร้สาย ประกอบง่าย มีคู่มือภาษาไทย",
+   specs:[["ประเภท","ชุด DIY ไร้สาย"],["ชิป","Nordic nRF"],["แถม","คู่มือภาษาไทย"]]},
+  {name:"ESP32-C3 Mini",price:78,cat:"ESP32",emoji:"🔌",imgs:[],
+   desc:"บอร์ด ESP32-C3 ขนาดเล็ก รองรับ WiFi และ Bluetooth Low Energy เหมาะกับโปรเจคที่มีพื้นที่จำกัด",
+   specs:[["ชิป","ESP32-C3"],["WiFi","2.4GHz"],["Bluetooth","BLE 5.0"],["ขา GPIO","15 ขา"]]},
+  {name:"ESP32 DevKit",price:123,cat:"ESP32",emoji:"💻",imgs:[],
+   desc:"บอร์ดพัฒนา ESP32 DevKit V1 รองรับ WiFi + Bluetooth Dual Core ชาญสมรรถนะ เหมาะกับเริ่มต้นเรียน IoT",
+   specs:[["ชิป","ESP32-WROOM-32"],["WiFi","2.4GHz"],["Bluetooth","Classic + BLE"],["ขา GPIO","30 ขา"],["USB","Micro-USB"]]},
+  {name:"อุปกรณ์อิเล็กทรอนิกส์ DIY",price:99,cat:"อุปกรณ์ DIY",emoji:"🔧",imgs:[],
+   desc:"ชุดอุปกรณ์อิเล็กทรอนิกส์พื้นฐานสำหรับงาน DIY ประกอบด้วย ตัวต้านทาน ตัวเก็บประจุ LED และสายจั๊มเปอร์",
+   specs:[["เนื้อหา","ต้านทาน คาปาซิเตอร์ LED สายจั๊มเปอร์"],["เหมาะกับ","มือใหม่เริ่มเรียนอิเล็กทรอนิกส์"]]}
 ];
 
 let category="ทั้งหมด";
-let cart=[];
-let currentProduct=-1;
-let currentImg=0;
+let cart=[];   // เก็บชื่อสินค้า ซ้ำกันได้ (นับเป็นจำนวน)
+let currentProduct=-1, currentImg=0;
 
-/* ---------- แสดงรายการสินค้า ---------- */
+function priceOf(name){
+  const p=items.find(x=>x.name===name);
+  return p?p.price:0;
+}
+
+/* ---------- รายการสินค้า ---------- */
 function render(){
   const q=document.getElementById("search").value.toLowerCase();
-  const list=items.filter((p,i)=>
-    (category==="ทั้งหมด"||p.cat===category)&&p.name.toLowerCase().includes(q)
-  );
+  const list=items.filter(p=>(category==="ทั้งหมด"||p.cat===category)&&p.name.toLowerCase().includes(q));
   document.getElementById("products").innerHTML=list.map(p=>{
     const thumb=(p.imgs&&p.imgs.length)?`<img src="${p.imgs[0]}" alt="${p.name}" loading="lazy" onerror="this.style.display='none';this.parentElement.textContent='${p.emoji}'">`:p.emoji;
-    return `
-    <article class="card" onclick="showDetail(${items.indexOf(p)})">
+    return `<article class="card" onclick="showDetail(${items.indexOf(p)})">
       <div class="photo">${thumb}</div>
       <div class="info">
         <div class="name">${p.name}</div>
@@ -176,30 +199,13 @@ function render(){
   if(!list.length)document.getElementById("products").innerHTML="<p style='color:#888;padding:20px'>ไม่พบสินค้าที่ค้นหา</p>";
 }
 
-/* ---------- แสดงหน้ารายละเอียดสินค้า ---------- */
-function showDetail(i){
-  currentProduct=i;
-  currentImg=0;
-  const p=items[i];
-  document.getElementById("listView").style.display="none";
-  document.getElementById("detailView").style.display="block";
-  renderDetail();
-  window.scrollTo({top:0,behavior:"smooth"});
-}
-
+/* ---------- หน้ารายละเอียด ---------- */
+function showDetail(i){currentProduct=i;currentImg=0;document.getElementById("listView").style.display="none";document.getElementById("detailView").style.display="block";renderDetail();window.scrollTo({top:0,behavior:"smooth"});}
 function renderDetail(){
   const p=items[currentProduct];
   const hasImgs=p.imgs&&p.imgs.length>0;
-  const mainPic=hasImgs
-    ? `<img src="${p.imgs[currentImg]}" alt="${p.name}" onerror="this.style.display='none';this.parentElement.textContent='${p.emoji}'">`
-    : p.emoji;
-  let thumbs="";
-  if(hasImgs){
-    thumbs=p.imgs.map((src,idx)=>`
-      <div class="thumb ${idx===currentImg?'active':''}" onclick="setImg(${idx})">
-        <img src="${src}" alt="รูปที่ ${idx+1}" onerror="this.style.display='none';this.parentElement.textContent='${p.emoji}'">
-      </div>`).join("");
-  }
+  const mainPic=hasImgs?`<img src="${p.imgs[currentImg]}" alt="${p.name}" onerror="this.style.display='none';this.parentElement.textContent='${p.emoji}'">`:p.emoji;
+  const thumbs=hasImgs?p.imgs.map((src,idx)=>`<div class="thumb ${idx===currentImg?'active':''}" onclick="setImg(${idx})"><img src="${src}" alt="รูปที่ ${idx+1}" onerror="this.style.display='none';this.parentElement.textContent='${p.emoji}'"></div>`).join(""):"";
   const specsRows=(p.specs||[]).map(s=>`<tr><td>${s[0]}</td><td>${s[1]}</td></tr>`).join("");
   document.getElementById("detailBox").innerHTML=`
     <div class="detail-top">
@@ -215,32 +221,93 @@ function renderDetail(){
         ${specsRows?`<table class="spec-table"><tbody>${specsRows}</tbody></table>`:""}
         <div class="detail-actions">
           <button class="btn-cart" onclick="addCart('${p.name}')">เพิ่มลงตะกร้า</button>
+          <button class="btn-order" onclick="addCart('${p.name}');toggleCart(true);">สั่งซื้อเลย</button>
         </div>
       </div>
     </div>`;
 }
+function setImg(idx){currentImg=idx;renderDetail();}
+function goHome(){document.getElementById("detailView").style.display="none";document.getElementById("listView").style.display="block";window.scrollTo({top:0,behavior:"smooth"});}
 
-function setImg(idx){
-  currentImg=idx;
-  renderDetail();
-}
-
-function goHome(){
-  document.getElementById("detailView").style.display="none";
-  document.getElementById("listView").style.display="block";
-  window.scrollTo({top:0,behavior:"smooth"});
-}
-
-/* ---------- ตะกร้าสินค้า ---------- */
+/* ---------- ตะกร้า ---------- */
 function addCart(name){
   cart.push(name);
   document.getElementById("count").textContent=cart.length;
   alert("เพิ่ม "+name+" ลงตะกร้าแล้ว");
 }
-function showCart(){
-  if(!cart.length){alert("ตะกร้าของคุณยังว่างอยู่");return;}
-  const summary=cart.reduce((a,n)=>(a[n]=(a[n]||0)+1,a),{});
-  alert("สินค้าในตะกร้า:\n"+Object.entries(summary).map(([n,c])=>n+" x "+c).join("\n")+"\n\nกรุณาติดต่อร้านเพื่อยืนยันคำสั่งซื้อ");
+function toggleCart(forceOpen){
+  const panel=document.getElementById("cartPanel");
+  const overlay=document.getElementById("cartOverlay");
+  const open=forceOpen===true?!panel.classList.contains("open"):forceOpen===false?false:!panel.classList.contains("open");
+  panel.classList.toggle("open",open);
+  overlay.style.display=open?"block":"none";
+  if(open)renderCart();
+}
+function renderCart(){
+  const box=document.getElementById("cartItems");
+  if(!cart.length){box.innerHTML='<div class="cart-empty">ตะกร้าว่างอยู่<br>กดเพิ่มสินค้าก่อนนะครับ</div>';document.getElementById("cartTotal").textContent="฿0";return;}
+  const summary={};
+  cart.forEach(n=>summary[n]=(summary[n]||0)+1);
+  let total=0;
+  box.innerHTML=Object.entries(summary).map(([n,c])=>{
+    const sub=priceOf(n)*c; total+=sub;
+    return `<div class="cart-item"><span class="ci-name">${n}</span><span class="ci-qty">x${c}</span><span class="ci-price">฿${sub.toLocaleString("th-TH")}</span></div>`;
+  }).join("");
+  document.getElementById("cartTotal").textContent="฿"+total.toLocaleString("th-TH");
+}
+function clearCart(){
+  if(!cart.length)return;
+  if(confirm("ต้องการล้างตะกร้าหรือไม่?")){cart=[];document.getElementById("count").textContent="0";renderCart();}
+}
+
+/* ---------- สร้างข้อความสั่งซื้อ ---------- */
+function buildOrderText(){
+  if(!cart.length)return "";
+  const summary={};
+  cart.forEach(n=>summary[n]=(summary[n]||0)+1);
+  let total=0, i=1, lines=["สั่งซื้อสินค้าจาก SNOnlineshop","----------------"];
+  Object.entries(summary).forEach(([n,c])=>{
+    const sub=priceOf(n)*c; total+=sub;
+    lines.push(`${i}. ${n} x${c} = ฿${sub.toLocaleString("th-TH")}`); i++;
+  });
+  lines.push("----------------");
+  lines.push(`รวมทั้งหมด: ฿${total.toLocaleString("th-TH")}`);
+  lines.push("");
+  lines.push("ชื่อผู้รับ: ");
+  lines.push("ที่อยู่จัดส่ง: ");
+  lines.push("เบอร์โทร: ");
+  return lines.join("\n");
+}
+
+/* ---------- ปุ่มสั่งซื้อผ่าน LINE ---------- */
+function orderViaLine(){
+  if(!cart.length){alert("ตะกร้าว่างอยู่ กรุณาเพิ่มสินค้าก่อน");return;}
+  const text=buildOrderText();
+  if(LINE_ID && LINE_ID.trim()){
+    const url="https://line.me/R/oaMessage/"+LINE_ID.trim()+"/?text="+encodeURIComponent(text);
+    window.open(url,"_blank");
+  }else{
+    // ยังไม่ได้ใส่ LINE ID → ให้คัดลอกรายการแล้วแจ้งเตือน
+    copyOrder(true);
+    alert("ยังไม่ได้ตั้งค่า LINE ID ของร้าน\nระบบได้คัดลอกรายการสั่งซื้อไว้แล้ว\nให้เปิด LINE ของคุณแล้ววางส่งให้ร้าน\n\n(แนะนำ: กลับไปใส่ LINE_ID ในโค้ดด้วย จะได้กดเปิด LINE อัตโนมัติ)");
+  }
+}
+function copyOrder(fromOrderBtn){
+  if(!cart.length){alert("ตะกร้าว่างอยู่");return;}
+  const text=buildOrderText();
+  const done=()=>{if(!fromOrderBtn)alert("คัดลอกรายการสั่งซื้อแล้ว\nเปิด LINE/แชทแล้ววางส่งได้เลย");};
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text,done));
+  }else{
+    fallbackCopy(text,done);
+  }
+}
+function fallbackCopy(text,cb){
+  const ta=document.createElement("textarea");
+  ta.value=text; ta.style.position="fixed"; ta.style.opacity="0";
+  document.body.appendChild(ta); ta.select();
+  try{document.execCommand("copy");}catch(e){}
+  document.body.removeChild(ta); if(cb)cb();
 }
 
 render();
