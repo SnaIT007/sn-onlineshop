@@ -8,7 +8,7 @@
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,sans-serif;background:#f5f5f5;color:#222}
 header{background:#fff;padding:16px 5%;box-shadow:0 2px 6px #ddd}
-.brand{color:#ee4d2d;font-size:27px;font-weight:bold}
+.brand{color:#ee4d2d;font-size:27px;font-weight:bold;cursor:pointer}
 header p{margin:5px 0;color:#777;font-size:13px}
 .search{width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;margin-top:12px;font-size:16px}
 nav{display:flex;gap:9px;overflow:auto;padding:13px 5%;background:white}
@@ -20,7 +20,8 @@ nav button:hover{background:#fff0eb;color:#ee4d2d}
 main{padding:0 5% 30px}
 .section-title{font-size:20px;margin:22px 0 14px}
 .products{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
-.card{background:white;border-radius:9px;overflow:hidden;border:1px solid #eee}
+.card{background:white;border-radius:9px;overflow:hidden;border:1px solid #eee;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.card:hover{transform:translateY(-3px);box-shadow:0 6px 18px rgba(0,0,0,.12)}
 .photo{height:165px;background:#fff4ef;display:flex;align-items:center;justify-content:center;font-size:65px;overflow:hidden}
 .photo img{width:100%;height:100%;object-fit:cover;display:block}
 .info{padding:12px}
@@ -29,72 +30,208 @@ main{padding:0 5% 30px}
 .note{color:#888;font-size:12px;margin-bottom:10px}
 .buy{width:100%;padding:10px;border:0;border-radius:5px;background:#ee4d2d;color:white;font-size:14px;cursor:pointer}
 .buy:hover{background:#d83c20}
-.cart{position:fixed;right:16px;bottom:16px;background:#ee4d2d;color:white;padding:13px 18px;border-radius:30px;border:0;box-shadow:0 3px 12px #aaa;cursor:pointer}
+.cart{position:fixed;right:16px;bottom:16px;background:#ee4d2d;color:white;padding:13px 18px;border-radius:30px;border:0;box-shadow:0 3px 12px #aaa;cursor:pointer;z-index:50}
 footer{text-align:center;background:#222;color:white;padding:25px 10px;font-size:13px}
-@media(max-width:800px){.products{grid-template-columns:repeat(3,minmax(0,1fr))}.photo{height:135px}}
-@media(max-width:520px){.products{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.photo{height:125px}.info{padding:9px}.name{font-size:14px}.price{font-size:19px}.banner{padding:20px 15px}}
+
+/* ===== หน้ารายละเอียดสินค้า ===== */
+.back-btn{background:#fff;border:1px solid #ddd;padding:9px 16px;border-radius:20px;cursor:pointer;margin:16px 0;font-size:14px}
+.back-btn:hover{background:#fff0eb;color:#ee4d2d;border-color:#ee4d2d}
+.detail{background:#fff;border-radius:12px;padding:20px;border:1px solid #eee}
+.detail-top{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.main-img{width:100%;aspect-ratio:1/1;background:#fff4ef;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:110px;overflow:hidden}
+.main-img img{width:100%;height:100%;object-fit:cover;display:block}
+.thumbs{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.thumb{width:64px;height:64px;border-radius:8px;border:2px solid #eee;cursor:pointer;overflow:hidden;background:#fff4ef;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+.thumb.active{border-color:#ee4d2d}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.detail-name{font-size:22px;font-weight:bold;margin:0 0 10px;line-height:1.4}
+.detail-price{color:#ee4d2d;font-size:30px;font-weight:bold;margin:14px 0}
+.detail-desc{color:#444;line-height:1.7;margin:14px 0;font-size:15px}
+.spec-table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px}
+.spec-table td{border:1px solid #eee;padding:9px 12px}
+.spec-table td:first-child{background:#fafafa;font-weight:bold;width:35%;color:#555}
+.detail-actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+.btn-cart{flex:1;min-width:140px;padding:13px;border:0;border-radius:8px;background:#ee4d2d;color:white;font-size:15px;font-weight:bold;cursor:pointer}
+.btn-cart:hover{background:#d83c20}
+.gallery-note{font-size:12px;color:#999;margin-top:8px}
+
+@media(max-width:800px){.products{grid-template-columns:repeat(3,minmax(0,1fr))}.photo{height:135px}.detail-top{grid-template-columns:1fr}}
+@media(max-width:520px){.products{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.photo{height:125px}.info{padding:9px}.name{font-size:14px}.price{font-size:19px}.banner{padding:20px 15px}.detail{padding:14px}.detail-name{font-size:19px}.detail-price{font-size:24px}}
 </style>
 </head>
 <body>
 <header>
-<div class="brand">SNOnlineshop</div>
+<div class="brand" onclick="goHome()">SNOnlineshop</div>
 <p>ร้านอุปกรณ์อิเล็กทรอนิกส์และอุปกรณ์ DIY</p>
 <input class="search" id="search" placeholder="ค้นหาสินค้า..." oninput="render()">
 </header>
 <nav>
-<button onclick="category='ทั้งหมด';render()">ทั้งหมด</button>
-<button onclick="category='ESP32';render()">ESP32</button>
-<button onclick="category='อุปกรณ์ DIY';render()">อุปกรณ์ DIY</button>
-<button onclick="category='อื่นๆ';render()">อื่นๆ</button>
+<button onclick="category='ทั้งหมด';goHome();render()">ทั้งหมด</button>
+<button onclick="category='ESP32';goHome();render()">ESP32</button>
+<button onclick="category='อุปกรณ์ DIY';goHome();render()">อุปกรณ์ DIY</button>
+<button onclick="category='อื่นๆ';goHome();render()">อื่นๆ</button>
 </nav>
 <section class="banner">
 <h2>ยินดีต้อนรับสู่ SNOnlineshop</h2>
-<p>ค้นหาอุปกรณ์ที่คุณต้องการได้ที่นี่</p>
+<p>ค้นหาอุปกรณ์ที่คุณต้องการได้ที่นี่ · กดที่สินค้าเพื่อดูรายละเอียดและรูปเพิ่มเติม</p>
 </section>
 <main>
+<!-- หน้ารายการสินค้า -->
+<div id="listView">
 <h2 class="section-title">สินค้าของเรา</h2>
 <div class="products" id="products"></div>
+</div>
+
+<!-- หน้ารายละเอียดสินค้า (ซ่อนอยู่ตอนแรก) -->
+<div id="detailView" style="display:none">
+<button class="back-btn" onclick="goHome()">← กลับไปยังรายการสินค้า</button>
+<div class="detail" id="detailBox"></div>
+</div>
 </main>
 <button class="cart" onclick="showCart()">ตะกร้า (<span id="count">0</span>)</button>
 <footer>
 <strong>SNOnlineshop</strong>
-<p>ขอบคุณที่แวะมาเยี่ยมชมร้านของเรา</p>
+<p>ขอบคุณที่แวะมาเยี่ยมชมร้านของเรา · กดที่สินค้าเพื่อดูรูปและรายละเอียดเพิ่มเติม</p>
 <p>สอบถามรายละเอียดสินค้าก่อนสั่งซื้อ</p>
 </footer>
+
 <script>
 /* ============================================================
-   วิธีเพิ่มสินค้า: เพิ่มบรรทัดใหม่ใน items ตามแบบนี้
-   {name:"ชื่อสินค้า", price:150, cat:"ESP32", emoji:"🔌", img:""},
-   - cat  ต้องพิมพ์ตรงกับปุ่มหมวดหมู่: ESP32 / อุปกรณ์ DIY / อื่นๆ
-   - emoji ใช้เมื่อยังไม่มีรูปจริง
-   - img   ใส่ลิงก์รูป เช่น "images/esp32.jpg" (ถ้ามีรูปแล้วจะแสดงรูปแทน emoji อัตโนมัติ)
+   วิธีเพิ่มสินค้า: เพิ่มบล็อกใหม่ใน items ตามแบบนี้
+   {
+     name:"ชื่อสินค้า",
+     price:150,
+     cat:"ESP32",            // หมวด: ESP32 / อุปกรณ์ DIY / อื่นๆ
+     emoji:"🔌",              // ใช้เมื่อยังไม่มีรูป
+     imgs:[],                 // ใส่ลิงก์รูปหลายรูป เช่น ["esp32-1.jpg","esp32-2.jpg"]
+     desc:"รายละเอียดสินค้า...",
+     specs:[["ชิปประมวลผล","ESP32"],["WiFi","2.4GHz"]]
+   },
+   - ถ้า imgs ว่าง จะแสดง emoji อัตโนมัติ
+   - ถ้ามีรูปหลายรูป จะมีรูปเล็กด้านล่างให้กดดูสลับกัน
    ============================================================ */
 const items=[
-  {name:"nRFbox V2",price:1450,cat:"อุปกรณ์ DIY",emoji:"📟",img:"nRFbox-V2.png"},
-  {name:"ESP32-C3 Mini",price:78,cat:"ESP32",emoji:"🔌",img:""},
-  {name:"ESP32 DevKit",price:123,cat:"ESP32",emoji:"💻",img:""},
-  {name:"อุปกรณ์อิเล็กทรอนิกส์ DIY",price:99,cat:"อุปกรณ์ DIY",emoji:"🔧",img:""}
+  {
+    name:"nRFbox V2",
+    price:1450,
+    cat:"อุปกรณ์ DIY",
+    emoji:"📟",
+    imgs:[],
+    desc:"กล่องอุปกรณ์ DIY สำหรับงานไร้สาย Nordic nRF เหมาะสำหรับทำโปรเจค IoT และเซ็นเซอร์ไร้สาย ประกอบง่าย มีคู่มือภาษาไทย",
+    specs:[["ประเภท","ชุด DIY ไร้สาย"],["ชิป","Nordic nRF"],["แถม","คู่มือภาษาไทย"]]
+  },
+  {
+    name:"ESP32-C3 Mini",
+    price:78,
+    cat:"ESP32",
+    emoji:"🔌",
+    imgs:[],
+    desc:"บอร์ด ESP32-C3 ขนาดเล็ก รองรับ WiFi และ Bluetooth Low Energy เหมาะกับโปรเจคที่มีพื้นที่จำกัด",
+    specs:[["ชิป","ESP32-C3"],["WiFi","2.4GHz"],["Bluetooth","BLE 5.0"],["ขา GPIO","15 ขา"]]
+  },
+  {
+    name:"ESP32 DevKit",
+    price:123,
+    cat:"ESP32",
+    emoji:"💻",
+    imgs:[],
+    desc:"บอร์ดพัฒนา ESP32 DevKit V1 รองรับ WiFi + Bluetooth Dual Core ชาญสมรรถนะ เหมาะกับเริ่มต้นเรียน IoT",
+    specs:[["ชิป","ESP32-WROOM-32"],["WiFi","2.4GHz"],["Bluetooth","Classic + BLE"],["ขา GPIO","30 ขา"],["USB","Micro-USB"]]
+  },
+  {
+    name:"อุปกรณ์อิเล็กทรอนิกส์ DIY",
+    price:99,
+    cat:"อุปกรณ์ DIY",
+    emoji:"🔧",
+    imgs:[],
+    desc:"ชุดอุปกรณ์อิเล็กทรอนิกส์พื้นฐานสำหรับงาน DIY ประกอบด้วย ตัวต้านทาน ตัวเก็บประจุ LED และสายจั๊มเปอร์",
+    specs:[["เนื้อหา","ต้านทาน คาปาซิเตอร์ LED สายจั๊มเปอร์"],["เหมาะกับ","มือใหม่เริ่มเรียนอิเล็กทรอนิกส์"]]
+  }
 ];
+
 let category="ทั้งหมด";
 let cart=[];
+let currentProduct=-1;
+let currentImg=0;
+
+/* ---------- แสดงรายการสินค้า ---------- */
 function render(){
   const q=document.getElementById("search").value.toLowerCase();
-  const list=items.filter(p=>
+  const list=items.filter((p,i)=>
     (category==="ทั้งหมด"||p.cat===category)&&p.name.toLowerCase().includes(q)
   );
-  document.getElementById("products").innerHTML=list.map(p=>`
-    <article class="card">
-      <div class="photo">${p.img?`<img src="${p.img}" alt="${p.name}" loading="lazy" onerror="this.parentElement.textContent='${p.emoji}'">`:p.emoji}</div>
+  document.getElementById("products").innerHTML=list.map(p=>{
+    const thumb=(p.imgs&&p.imgs.length)?`<img src="${p.imgs[0]}" alt="${p.name}" loading="lazy" onerror="this.style.display='none';this.parentElement.textContent='${p.emoji}'">`:p.emoji;
+    return `
+    <article class="card" onclick="showDetail(${items.indexOf(p)})">
+      <div class="photo">${thumb}</div>
       <div class="info">
         <div class="name">${p.name}</div>
         <div class="price">฿${p.price.toLocaleString("th-TH")}</div>
-        <div class="note">สอบถามสต็อกก่อนสั่งซื้อ</div>
-        <button class="buy" onclick="addCart('${p.name}')">เพิ่มลงตะกร้า</button>
+        <div class="note">กดเพื่อดูรายละเอียด · สอบถามสต็อกก่อนสั่งซื้อ</div>
+        <button class="buy" onclick="event.stopPropagation();addCart('${p.name}')">เพิ่มลงตะกร้า</button>
       </div>
-    </article>
-  `).join("");
-  if(!list.length)document.getElementById("products").innerHTML="ไม่พบสินค้าที่ค้นหา";
+    </article>`;
+  }).join("");
+  if(!list.length)document.getElementById("products").innerHTML="<p style='color:#888;padding:20px'>ไม่พบสินค้าที่ค้นหา</p>";
 }
+
+/* ---------- แสดงหน้ารายละเอียดสินค้า ---------- */
+function showDetail(i){
+  currentProduct=i;
+  currentImg=0;
+  const p=items[i];
+  document.getElementById("listView").style.display="none";
+  document.getElementById("detailView").style.display="block";
+  renderDetail();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function renderDetail(){
+  const p=items[currentProduct];
+  const hasImgs=p.imgs&&p.imgs.length>0;
+  const mainPic=hasImgs
+    ? `<img src="${p.imgs[currentImg]}" alt="${p.name}" onerror="this.style.display='none';this.parentElement.textContent='${p.emoji}'">`
+    : p.emoji;
+  let thumbs="";
+  if(hasImgs){
+    thumbs=p.imgs.map((src,idx)=>`
+      <div class="thumb ${idx===currentImg?'active':''}" onclick="setImg(${idx})">
+        <img src="${src}" alt="รูปที่ ${idx+1}" onerror="this.style.display='none';this.parentElement.textContent='${p.emoji}'">
+      </div>`).join("");
+  }
+  const specsRows=(p.specs||[]).map(s=>`<tr><td>${s[0]}</td><td>${s[1]}</td></tr>`).join("");
+  document.getElementById("detailBox").innerHTML=`
+    <div class="detail-top">
+      <div>
+        <div class="main-img">${mainPic}</div>
+        <div class="thumbs">${thumbs}</div>
+        ${hasImgs?`<div class="gallery-note">มีรูปทั้งหมด ${p.imgs.length} รูป · กดรูปเล็กเพื่อดูรูปใหญ่</div>`:`<div class="gallery-note">ยังไม่มีรูปจริง · แสดงไอคอนชั่วคราว</div>`}
+      </div>
+      <div>
+        <h1 class="detail-name">${p.name}</h1>
+        <div class="detail-price">฿${p.price.toLocaleString("th-TH")}</div>
+        <div class="detail-desc">${p.desc||""}</div>
+        ${specsRows?`<table class="spec-table"><tbody>${specsRows}</tbody></table>`:""}
+        <div class="detail-actions">
+          <button class="btn-cart" onclick="addCart('${p.name}')">เพิ่มลงตะกร้า</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function setImg(idx){
+  currentImg=idx;
+  renderDetail();
+}
+
+function goHome(){
+  document.getElementById("detailView").style.display="none";
+  document.getElementById("listView").style.display="block";
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* ---------- ตะกร้าสินค้า ---------- */
 function addCart(name){
   cart.push(name);
   document.getElementById("count").textContent=cart.length;
@@ -105,6 +242,7 @@ function showCart(){
   const summary=cart.reduce((a,n)=>(a[n]=(a[n]||0)+1,a),{});
   alert("สินค้าในตะกร้า:\n"+Object.entries(summary).map(([n,c])=>n+" x "+c).join("\n")+"\n\nกรุณาติดต่อร้านเพื่อยืนยันคำสั่งซื้อ");
 }
+
 render();
 </script>
 </body>
